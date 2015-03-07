@@ -23,6 +23,7 @@ public class JPAHibernate5Test {
 		
 		//	Uso de OneToOne
 		//	bidireccional con entidad dominante (mappedBy = "entity dominant")
+		//	en bidireccional necesitas setear de los dos lados
 		Direccion direccion1 = new Direccion("Av. Juan Velasco 1340 Lima 42");
 		Policia policia1 = new Policia("Sargento Pimienta");
 		policia1.setDireccion(direccion1);
