@@ -15,7 +15,7 @@ import com.mycompany.demo.onetoone.Marca;
 import com.mycompany.demo.onetoone.MarcaBiVariant;
 import com.mycompany.demo.util.JPAUtil;
 
-public class JPAHibernate1Test {
+public class JPA01Test {
 	public static void main(String[] args) {
 		EntityManager em = JPAUtil.getEntityManager();
 		Query query = em.createQuery("select m from Marca m",Marca.class);

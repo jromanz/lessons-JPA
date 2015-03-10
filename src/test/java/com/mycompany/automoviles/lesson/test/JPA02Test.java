@@ -11,7 +11,7 @@ import com.mycompany.demo.inheritance.Refrigeradora;
 import com.mycompany.demo.multipletables.Cliente;
 import com.mycompany.demo.util.JPAUtil;
 
-public class JPAHibernate2Test {
+public class JPA02Test {
 	public static void main(String[] args) {
 		
 		//Persistiendo con @SecondaryTables

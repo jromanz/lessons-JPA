@@ -8,7 +8,7 @@ import com.mycompany.demo.embedded.Documentacion;
 import com.mycompany.demo.embedded.Funcionario;
 import com.mycompany.demo.util.JPAUtil;
 
-public class JPAHibernate3Test {
+public class JPA03Test {
 	
 	public static void main(String[] args) {
 		java.util.Date date = new java.util.Date(1978,9,18);

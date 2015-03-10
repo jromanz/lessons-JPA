@@ -11,7 +11,7 @@ import com.mycompany.demo.collections.Master;
 import com.mycompany.demo.collections.RolUsuario;
 import com.mycompany.demo.util.JPAUtil;
 
-public class JPAHibernate4Test {
+public class JPA04Test {
 	public static void main(String[] args) {
 		EntityManager em = JPAUtil.getEntityManager();
 		

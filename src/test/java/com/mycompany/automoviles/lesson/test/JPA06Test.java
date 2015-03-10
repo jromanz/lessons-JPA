@@ -9,7 +9,7 @@ import com.mycompany.demo.onetomany2.AulaBi;
 import com.mycompany.demo.onetomany2.EstudianteBi;
 import com.mycompany.demo.util.JPAUtil;
 
-public class JPAHibernate6Test {
+public class JPA06Test {
 
 	public static void main(String[] args) {
 		EntityManager em = JPAUtil.getEntityManager();

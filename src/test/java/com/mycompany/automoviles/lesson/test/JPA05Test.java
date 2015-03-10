@@ -8,7 +8,7 @@ import com.mycompany.demo.onetoone2.Policia;
 import com.mycompany.demo.onetoone2.Teclado;
 import com.mycompany.demo.util.JPAUtil;
 
-public class JPAHibernate5Test {
+public class JPA05Test {
 	public static void main(String[] args) {
 		EntityManager em = JPAUtil.getEntityManager();
 		

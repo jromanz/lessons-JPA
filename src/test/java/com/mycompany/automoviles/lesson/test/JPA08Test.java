@@ -9,17 +9,14 @@ import com.mycompany.demo.manytomany2.Curso;
 import com.mycompany.demo.manytomany2.Profesor;
 import com.mycompany.demo.util.JPAUtil;
 
-public class JPAHibernate7Test {
+public class JPA08Test {
 
 	public static void main(String[] args) {
 		EntityManager em = JPAUtil.getEntityManager();
 
-		// Uso de many-to-many
-		// Debe existir una entidad dominante asi que en la dominada
-		// debera ir mappedBy(name="variable_entity_in_dominator") 
-		// y para que solo tenga una tabla en la entidad dominante ira
-		// @JoinTable(name="nombre_tabla_intermedia")
-		// Ejemplo Bidireccional
+		// 	Las entidades presentan 3 comportamientos
+		//	MANAGED, REMOVED, DETACHED
+		
 		
 		Profesor profesor1 = new Profesor("David Trezeguet");
 		Profesor profesor2 = new Profesor("Arturo Fortaine");
@@ -48,6 +45,10 @@ public class JPAHibernate7Test {
 			em.persist(profesor3);
 			em.persist(profesor4);
 			em.getTransaction().commit();
+			em.getTransaction().begin();
+			Profesor prof = em.find(Profesor.class, 2L);
+			prof.setNombre("Julian");
+			em.getTransaction().commit();
 		} catch (Exception e) {
 			if (em.isOpen()) {
 				em.getTransaction().rollback();
@@ -57,5 +58,7 @@ public class JPAHibernate7Test {
 				em.close();
 			}
 		}
+		
+	
 	}
 }

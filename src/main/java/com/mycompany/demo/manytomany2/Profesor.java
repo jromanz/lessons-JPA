@@ -11,7 +11,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="many_to_many_profesor")
+@Table(name="many_to_many_profesor1")
 public class Profesor {
 
 	@Id
@@ -20,7 +20,7 @@ public class Profesor {
 	private String nombre;
 	
 	@ManyToMany
-	@JoinTable(name="many_to_many_profesor_curso")
+	@JoinTable(name="many_to_many_profesor_curso1")
 	private List<Curso> cursos;
 	
 	public Profesor() {
@@ -59,6 +59,12 @@ public class Profesor {
 
 	public void setCursos(List<Curso> cursos) {
 		this.cursos = cursos;
+	}
+
+	@Override
+	public String toString() {
+		return "Profesor [id=" + id + ", nombre=" + nombre + ", cursos="
+				+ cursos + "]";
 	}
 	
 	
