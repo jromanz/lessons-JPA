@@ -3,13 +3,7 @@ package com.mycompany.automoviles.lesson.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.EntityManager;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import com.mycompany.demo.persist.Cachorro;
 import com.mycompany.demo.persist.Doctor;
@@ -87,8 +81,6 @@ public class JPA12Test {
 			doctor2.setLaptops(listaLaptops2);
 
 			em.persist(doctor1);
-			em.getTransaction().commit();
-			em.getTransaction().begin();
 			em.persist(doctor2);
 			em.getTransaction().commit();
 		} catch (Exception e) {
