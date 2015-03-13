@@ -4,8 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -15,24 +13,23 @@ public class Estilo {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private String descripcion;
-	
-	@ManyToOne
-	@JoinColumn(name="estilo_id")
-	private SubItem subItem;
+	private String titulo;
 
 	public Estilo() {
 	}
 	
-	public Estilo(String descripcion) {
-		super();
-		this.descripcion = descripcion;
+	public String getTitulo() {
+		return titulo;
 	}
 
-	public Estilo(Integer id, String descripcion, SubItem subItem) {
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
+
+	public Estilo(String descripcion, String titulo) {
 		super();
-		this.id = id;
 		this.descripcion = descripcion;
-		this.subItem = subItem;
+		this.titulo = titulo;
 	}
 
 	public Integer getId() {
@@ -51,14 +48,5 @@ public class Estilo {
 		this.descripcion = descripcion;
 	}
 
-	public SubItem getSubItem() {
-		return subItem;
-	}
-
-	public void setSubItem(SubItem subItem) {
-		this.subItem = subItem;
-	}
-	
-	
 	
 }

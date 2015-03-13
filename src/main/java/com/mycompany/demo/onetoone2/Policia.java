@@ -8,16 +8,19 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="one_to_one_policia")
+@Table(name = "one_to_one_policia")
 public class Policia {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String nombre;
-	
+
 	@OneToOne
 	private Direccion direccion;
-	
+
+	public Policia() {
+	}
+
 	public Policia(String nombre) {
 		super();
 		this.nombre = nombre;
@@ -52,7 +55,5 @@ public class Policia {
 	public void setDireccion(Direccion direccion) {
 		this.direccion = direccion;
 	}
-	
-	
-	
+
 }

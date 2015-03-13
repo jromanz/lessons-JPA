@@ -18,6 +18,9 @@ public class Direccion {
 	@OneToOne(mappedBy="direccion")	//entidad dominante en mappedBy
 	private Policia policia;
 	
+	public Direccion() {
+	}
+	
 	public Direccion(String nombreCalle) {
 		super();
 		this.nombreCalle = nombreCalle;

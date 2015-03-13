@@ -15,7 +15,10 @@ public class Teclado {
 	private String marca;
 	private String modelo;
 	private Integer ano;
-
+	
+	public Teclado() {
+	}
+	
 	public Teclado(String marca, String modelo, Integer ano) {
 		super();
 		this.marca = marca;
