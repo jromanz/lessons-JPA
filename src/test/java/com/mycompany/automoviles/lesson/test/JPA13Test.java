@@ -66,7 +66,6 @@ public class JPA13Test {
 			em.persist(canal2);
 			em.persist(canal3);
 			em.persist(canal4);
-			
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			if (em.isOpen()) {

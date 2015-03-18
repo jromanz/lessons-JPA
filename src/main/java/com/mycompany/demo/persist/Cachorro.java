@@ -65,4 +65,9 @@ public class Cachorro implements Serializable {
 		this.doctorCachorro = doctor;
 	}
 
+	@Override
+	public String toString() {
+		return "Cachorro [id=" + id + "]";
+	}
+
 }

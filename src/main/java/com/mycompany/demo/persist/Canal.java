@@ -12,6 +12,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 @Entity
 @Table(name = "persist_manytomany_canal")
 public class Canal {
@@ -25,6 +28,7 @@ public class Canal {
 	@JoinTable(name = "persist_manytomany_televisor_canal", 
 					joinColumns = {@JoinColumn(name="cana_id")}, 
 					inverseJoinColumns = {@JoinColumn(name="tele_id")})
+	@LazyCollection(LazyCollectionOption.TRUE)
 	private Collection<Televisor> televisores;
 	
 	public Canal() {

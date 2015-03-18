@@ -23,17 +23,17 @@ public class Doctor implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="doctor_id")
+	@Column(name = "doctor_id")
 	private int id;
 	private String dni;
 	private String nombre;
 
 	@OneToMany(mappedBy = "doctorLaptop", cascade = CascadeType.PERSIST)
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@LazyCollection(LazyCollectionOption.TRUE)
 	private Collection<Laptop> laptops;
 
 	@OneToMany(mappedBy = "doctorCachorro", cascade = CascadeType.PERSIST)
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@LazyCollection(LazyCollectionOption.TRUE)
 	private Collection<Cachorro> cachorros;
 
 	public Doctor() {
@@ -83,6 +83,11 @@ public class Doctor implements Serializable {
 
 	public void setCachorros(Collection<Cachorro> cachorros) {
 		this.cachorros = cachorros;
+	}
+
+	@Override
+	public String toString() {
+		return "Doctor [id=" + id + ", dni=" + dni + ", nombre=" + nombre + "]";
 	}
 
 }

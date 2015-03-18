@@ -67,4 +67,9 @@ public class Laptop implements Serializable {
 		this.doctorLaptop = doctor;
 	}
 
+	@Override
+	public String toString() {
+		return "Laptop [id=" + id + "]";
+	}
+
 }
