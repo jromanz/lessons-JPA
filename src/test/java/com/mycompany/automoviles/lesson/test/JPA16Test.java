@@ -1,5 +1,7 @@
 package com.mycompany.automoviles.lesson.test;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.mycompany.demo.persist.Cachorro;
@@ -14,22 +17,57 @@ import com.mycompany.demo.persist.Doctor;
 import com.mycompany.demo.persist.Laptop;
 import com.mycompany.demo.util.JPAUtil;
 
-import static org.junit.Assert.*;
-
 public class JPA16Test {
-
+	
 	@Test
-	public void testeandoStoreProcedure() {
+	public void deberiaFuncionarStoreProcedure(){
+		// uso de JPA 2.1 llamando un store procedure
+		// Este StoreProcedure crearlo en Mysql
+		/*
+		 * DELIMITER $$ 
+		 * CREATE PROCEDURE getDoctorByCachorroRaza(in raza varchar(30)) 
+		 * begin select d.dni, d.nombre, c.raza, c.nombre 
+		 * from persist_doctor d join persist_cachorro c 
+		 * on d.doctor_id = c.doctor_id
+		 * where c.raza = raza; END$$ DELIMITER ;
+		 */
+		EntityManager em = JPAUtil.getEntityManager();
+
+		try {
+			// Store Procedure IN PARAMETER
+			em.getTransaction().begin();
+			StoredProcedureQuery storeProcedure = em
+					.createStoredProcedureQuery("getDoctorByCachorroRaza");
+			storeProcedure.registerStoredProcedureParameter(0, String.class, ParameterMode.IN);
+			storeProcedure.setParameter(0, "PEKINES");
+			java.util.List<Object[]> resultado = storeProcedure.getResultList();
+			System.out.println(resultado.size());
+			assertEquals(resultado.size(),5);
+			System.out.println(resultado.size());
+			for (Object[] objectJoin : resultado) {
+				System.out.println(String.valueOf(objectJoin[0]) + ", " + objectJoin[1].toString() + ", "
+						+ objectJoin[2].toString() + ", " + objectJoin[3].toString() + ", "
+						+ objectJoin[4].toString());
+			}
+			em.getTransaction().commit();
+
+		} catch (Exception e) {
+			if (em.isOpen()) {
+				em.getTransaction().rollback();
+			}
+		} finally {
+			if (em.isOpen()) {
+				em.close();
+			}
+		}
+		
+	}
+	
+	@Before
+	public void testeandoCargaDeDatos() {
 
 		EntityManager em = JPAUtil.getEntityManager();
 
-		// uso de JPQL Llamando un store procedure
-		/*
-		 * DELIMITER $$ CREATE PROCEDURE getDoctorByCachorroRaza(in raza
-		 * varchar(30)) begin select d.dni, d.nombre, c.raza, c.nombre from
-		 * persist_doctor d join persist_cachorro c on d.doctor_id = c.doctor_id
-		 * where c.raza = raza; END$$ DELIMITER ;
-		 */
 		try {
 
 			// Llenando entidades Doctor, Cachorro, Laptop
@@ -181,24 +219,6 @@ public class JPA16Test {
 			em.persist(doctor2);
 			em.persist(doctor3);
 			em.persist(doctor4);
-			em.getTransaction().commit();
-
-			// Aqui comienza JPA
-			// Store Procedure IN PARAMETER
-			em.getTransaction().begin();
-			StoredProcedureQuery storeProcedure = em
-					.createStoredProcedureQuery("getDoctorByCachorroRaza");
-			storeProcedure.registerStoredProcedureParameter(0, String.class, ParameterMode.IN);
-			storeProcedure.setParameter(0, "PEKINES");
-			java.util.List<Object[]> resultado = storeProcedure.getResultList();
-			System.out.println(resultado.size());
-			assertEquals(resultado.size(),5);
-			System.out.println(resultado.size());
-			for (Object[] objectJoin : resultado) {
-				System.out.println(String.valueOf(objectJoin[0]) + ", " + objectJoin[1].toString() + ", "
-						+ objectJoin[2].toString() + ", " + objectJoin[3].toString() + ", "
-						+ objectJoin[4].toString());
-			}
 			em.getTransaction().commit();
 
 		} catch (Exception e) {
