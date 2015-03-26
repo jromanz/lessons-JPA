@@ -2,6 +2,7 @@ package com.mycompany.demo.persist;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,7 +21,7 @@ public class Cachorro implements Serializable {
 	private Integer id;
 	private String raza;
 	private String nombre;
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "doctor_id")
 	private Doctor doctorCachorro;
 

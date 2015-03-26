@@ -4,11 +4,14 @@
 	<groupId>com.mycompany.demo</groupId>
 	<artifactId>lessonsJPA</artifactId>
 	<version>1.0</version>
+	<properties>
+		<hibernate.version>4.3.5.Final</hibernate.version>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<version>4.8.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -17,44 +20,22 @@
 			<version>5.1.18</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.3</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-			<version>1.2.2</version>
-		</dependency>
-
-		<!-- Hibernate 4 -->
-	<!-- Implementacion de Bean Validation -->
-		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>5.0.1.Final</version>
 			<scope>compile</scope>
 		</dependency>
-
-		<!-- Núcleo de Hibernate -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>4.2.3.Final</version>
-			<scope>compile</scope>
-		</dependency>
-
 		<!-- Implementacion de EntityManager de JPA -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<version>4.2.3.Final</version>
+			<version>${hibernate.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-ehcache</artifactId>
-			<version>4.2.3.Final</version>
+			<version>${hibernate.version}</version>
 		</dependency>
 	</dependencies>
 	<repositories>

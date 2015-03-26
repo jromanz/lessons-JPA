@@ -1,20 +1,12 @@
 package com.mycompany.automoviles.lesson.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Root;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.mycompany.demo.persist.Cachorro;
@@ -22,112 +14,22 @@ import com.mycompany.demo.persist.Doctor;
 import com.mycompany.demo.persist.Laptop;
 import com.mycompany.demo.util.JPAUtil;
 
-public class JPA15Test {
+import static org.junit.Assert.*;
 
-	// uso de JPQL Parte II (en relaciones one-to-many)
-	// uso de fetch join (evita lazyinitialization exception)
+public class JPA16Test {
 
-	String consultaJoinFetch = "select d, l from Doctor d "
-			+ "join fetch d.laptops l " + "where l.marca= :marca";
-
-	String consultaJoin = "SELECT d.nombre, c.raza, c.nombre "
-			+ "FROM Doctor d, Cachorro c "
-			+ "WHERE d.id = c.doctorCachorro.id " + "AND c.raza= :raza";
-	
 	@Test
-	public void testeandoConsultaJoinConCriteria(){
-		EntityManager em = JPAUtil.getEntityManager();
-
-		try {
-
-			// USO DE CRITERIAQUERY Y CRITERIABUILDER
-			em.getTransaction().begin();
-			CriteriaBuilder cb = em.getCriteriaBuilder();
-			CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
-			Root<Doctor> rootDoctor = cq.from(Doctor.class);
-			Join<Doctor,Cachorro> consultaJoin = rootDoctor.join("cachorros");
-			cq.where(
-					cb.equal(rootDoctor.get("doctorCachorro").get("id"), rootDoctor.get("id")),
-					cb.equal(rootDoctor.get("cachorros").get("raza"), "PEKINES"));
-			cq.select(cb.array(
-						rootDoctor.get("id"),
-						rootDoctor.get("nombre"),
-						rootDoctor.get("cachorros").get("raza"),
-						rootDoctor.get("cachorros").get("nombre")
-					));
-			
-			TypedQuery<Object[]> query = em.createQuery(cq);
-			List<Object[]> lista = query.getResultList();
-			assertNotNull(lista);
-			assertEquals(lista.size(), 5);
-			System.out.println(lista.size());
-			for (Object[] objectJoin : lista) {
-				System.out.println(String.valueOf(objectJoin[0]) + ", " + objectJoin[1].toString() + ", "
-						+ objectJoin[2].toString() + ", " + objectJoin[3].toString() + ", "
-						+ objectJoin[4].toString());
-			}
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			if (em.isOpen()) {
-				em.getTransaction().rollback();
-			}
-		} finally {
-			if (em.isOpen()) {
-				em.close();
-			}
-		}
-	}
-	
-	@Test
-	public void testeandoConsultaJoin() {
-		EntityManager em = JPAUtil.getEntityManager();
-
-		try {
-
-			// Aqui comienza JPA
-			// USO DE JOIN FETCH
-			em.getTransaction().begin();
-			TypedQuery query = (TypedQuery) em.createQuery(consultaJoinFetch);
-			query.setParameter("marca", "TOSHIBA");
-			List lista = query.getResultList();
-
-			assertNotNull(lista);
-			assertEquals(lista.size(), 3);
-
-			for (Object object : lista) {
-				System.out.println(object);
-			}
-
-			// USO DE QUERY AND JOIN (consulta se basa en dominante)
-			Query queryJoin = em.createQuery(consultaJoin);
-			queryJoin.setParameter("raza", "PEKINES");
-			List<Object[]> listaJoin = queryJoin.getResultList();
-
-			assertNotNull(listaJoin);
-			assertEquals(listaJoin.size(), 5);
-
-			for (Object[] objectJoin : listaJoin) {
-				System.out.println(objectJoin[0] + ", " + objectJoin[1] + ", "
-						+ objectJoin[2]);
-			}
-
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			if (em.isOpen()) {
-				em.getTransaction().rollback();
-			}
-		} finally {
-			if (em.isOpen()) {
-				em.close();
-			}
-		}
-	}
-
-	@Before
-	public void testeandoCargaDeDatos() {
+	public void testeandoStoreProcedure() {
 
 		EntityManager em = JPAUtil.getEntityManager();
 
+		// uso de JPQL Llamando un store procedure
+		/*
+		 * DELIMITER $$ CREATE PROCEDURE getDoctorByCachorroRaza(in raza
+		 * varchar(30)) begin select d.dni, d.nombre, c.raza, c.nombre from
+		 * persist_doctor d join persist_cachorro c on d.doctor_id = c.doctor_id
+		 * where c.raza = raza; END$$ DELIMITER ;
+		 */
 		try {
 
 			// Llenando entidades Doctor, Cachorro, Laptop
@@ -279,6 +181,24 @@ public class JPA15Test {
 			em.persist(doctor2);
 			em.persist(doctor3);
 			em.persist(doctor4);
+			em.getTransaction().commit();
+
+			// Aqui comienza JPA
+			// Store Procedure IN PARAMETER
+			em.getTransaction().begin();
+			StoredProcedureQuery storeProcedure = em
+					.createStoredProcedureQuery("getDoctorByCachorroRaza");
+			storeProcedure.registerStoredProcedureParameter(0, String.class, ParameterMode.IN);
+			storeProcedure.setParameter(0, "PEKINES");
+			java.util.List<Object[]> resultado = storeProcedure.getResultList();
+			System.out.println(resultado.size());
+			assertEquals(resultado.size(),5);
+			System.out.println(resultado.size());
+			for (Object[] objectJoin : resultado) {
+				System.out.println(String.valueOf(objectJoin[0]) + ", " + objectJoin[1].toString() + ", "
+						+ objectJoin[2].toString() + ", " + objectJoin[3].toString() + ", "
+						+ objectJoin[4].toString());
+			}
 			em.getTransaction().commit();
 
 		} catch (Exception e) {
