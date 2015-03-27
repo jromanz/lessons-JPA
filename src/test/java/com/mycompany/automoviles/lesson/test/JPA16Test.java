@@ -9,7 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.mycompany.demo.persist.Cachorro;
@@ -45,9 +45,10 @@ public class JPA16Test {
 			assertEquals(resultado.size(),5);
 			System.out.println(resultado.size());
 			for (Object[] objectJoin : resultado) {
-				System.out.println(String.valueOf(objectJoin[0]) + ", " + objectJoin[1].toString() + ", "
-						+ objectJoin[2].toString() + ", " + objectJoin[3].toString() + ", "
-						+ objectJoin[4].toString());
+				for (int i = 0; i < objectJoin.length; i++) {
+					Object object = objectJoin[i];
+					System.out.println(object.toString());
+				}
 			}
 			em.getTransaction().commit();
 
@@ -63,8 +64,8 @@ public class JPA16Test {
 		
 	}
 	
-	@Before
-	public void testeandoCargaDeDatos() {
+	@BeforeClass
+	public static void testeandoCargaDeDatos() {
 
 		EntityManager em = JPAUtil.getEntityManager();
 

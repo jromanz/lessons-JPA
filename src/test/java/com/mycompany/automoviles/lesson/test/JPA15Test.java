@@ -14,12 +14,13 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.mycompany.demo.persist.Cachorro;
 import com.mycompany.demo.persist.Doctor;
 import com.mycompany.demo.persist.Laptop;
+import com.mycompany.demo.report.DoctorByCachorroRaza;
 import com.mycompany.demo.util.JPAUtil;
 
 public class JPA15Test {
@@ -27,7 +28,7 @@ public class JPA15Test {
 	// uso de JPQL Parte II (en relaciones one-to-many)
 	// uso de fetch join (evita lazyinitialization exception)
 
-	String consultaJoinFetch = "select d, l from Doctor d "
+	String consultaJoinFetch = "select d from Doctor d "
 			+ "join fetch d.laptops l " + "where l.marca= :marca";
 
 	String consultaJoin = "SELECT d.nombre, c.raza, c.nombre "
@@ -43,28 +44,26 @@ public class JPA15Test {
 			// USO DE CRITERIAQUERY Y CRITERIABUILDER
 			em.getTransaction().begin();
 			CriteriaBuilder cb = em.getCriteriaBuilder();
-			CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
+			CriteriaQuery<DoctorByCachorroRaza> cq = cb.createQuery(DoctorByCachorroRaza.class);
 			Root<Doctor> rootDoctor = cq.from(Doctor.class);
 			Join<Doctor,Cachorro> consultaJoin = rootDoctor.join("cachorros");
 			cq.where(
 					cb.equal(rootDoctor.get("doctorCachorro").get("id"), rootDoctor.get("id")),
 					cb.equal(rootDoctor.get("cachorros").get("raza"), "PEKINES"));
-			cq.select(cb.array(
+			cq.multiselect(cb.construct(DoctorByCachorroRaza.class,
 						rootDoctor.get("id"),
 						rootDoctor.get("nombre"),
 						rootDoctor.get("cachorros").get("raza"),
 						rootDoctor.get("cachorros").get("nombre")
 					));
 			
-			TypedQuery<Object[]> query = em.createQuery(cq);
-			List<Object[]> lista = query.getResultList();
+			TypedQuery<DoctorByCachorroRaza> query = em.createQuery(cq);
+			List<DoctorByCachorroRaza> lista = query.getResultList();
 			assertNotNull(lista);
 			assertEquals(lista.size(), 5);
 			System.out.println(lista.size());
-			for (Object[] objectJoin : lista) {
-				System.out.println(String.valueOf(objectJoin[0]) + ", " + objectJoin[1].toString() + ", "
-						+ objectJoin[2].toString() + ", " + objectJoin[3].toString() + ", "
-						+ objectJoin[4].toString());
+			for (DoctorByCachorroRaza doctorByCachorroRaza : lista) {
+				System.out.println(doctorByCachorroRaza.getRazaCachorro());
 			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -95,7 +94,7 @@ public class JPA15Test {
 			assertEquals(lista.size(), 3);
 
 			for (Object object : lista) {
-				System.out.println(object);
+				System.out.println(object+"[]");
 			}
 
 			// USO DE QUERY AND JOIN (consulta se basa en dominante)
@@ -107,7 +106,7 @@ public class JPA15Test {
 			assertEquals(listaJoin.size(), 5);
 
 			for (Object[] objectJoin : listaJoin) {
-				System.out.println(objectJoin[0] + ", " + objectJoin[1] + ", "
+				System.out.println(objectJoin[0] + ",- " + objectJoin[1] + ",- "
 						+ objectJoin[2]);
 			}
 
@@ -123,8 +122,8 @@ public class JPA15Test {
 		}
 	}
 
-	@Before
-	public void testeandoCargaDeDatos() {
+	@BeforeClass
+	public static void testeandoCargaDeDatos() {
 
 		EntityManager em = JPAUtil.getEntityManager();
 

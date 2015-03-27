@@ -28,11 +28,11 @@ public class Doctor implements Serializable {
 	private String dni;
 	private String nombre;
 
-	@OneToMany(mappedBy = "doctorLaptop", cascade = CascadeType.PERSIST)
+	@OneToMany(mappedBy = "doctorLaptop", cascade = CascadeType.ALL)
 	@LazyCollection(LazyCollectionOption.TRUE)
 	private Collection<Laptop> laptops;
 
-	@OneToMany(mappedBy = "doctorCachorro", cascade = CascadeType.PERSIST)
+	@OneToMany(mappedBy = "doctorCachorro", cascade = CascadeType.ALL)
 	@LazyCollection(LazyCollectionOption.TRUE)
 	private Collection<Cachorro> cachorros;
 
