@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import com.mycompany.demo.persist.AlumnoPostGrado;
 import com.mycompany.demo.persist.CursoPostGrado;
+import com.mycompany.demo.report.CursosAlumnosVO;
 import com.mycompany.demo.util.JPAUtil;
 
 
@@ -32,9 +33,20 @@ public class JPA17Test {
 	//Uso de between
 	String query6 = "select a from AlumnoPostGrado a where a.peso between :pesoini and :pesofin order by a.peso desc";
 	String query7 = "select a from AlumnoPostGrado a where a.fechaNac between :fechaini and :fechafin order by a.fechaNac asc";
-	
+	//Uso de member of
 	String query8 = "select c from CursoPostGrado c where :alumno member of c.alumnos";
-	
+	//Uso de exists, any, all
+	String query9 = "select c from CursoPostGrado c where exists (select a from c.alumnos a where a.peso between :pesoini and :pesofin)";
+	//Uso de concat
+	String query10 = "select concat(a.nombre, concat(\' has born in \',a.fechaNac)) from AlumnoPostGrado a";
+	//Uso size
+	String query11 = "select size(c.alumnos) from CursoPostGrado c where c.nombre like :nombre GROUP BY c.nombre";
+	//Usos de Clases VO
+	String query12 = "select new com.mycompany.demo.report.CursosAlumnosVO(c, size(c.alumnos)) "
+			+ "from CursoPostGrado c "
+			+ "where c.nombre like :nombre "
+			+ "GROUP BY c.nombre "
+			+ "ORDER BY c.nombre desc";
 	
 	@Test
 	public void deberiaFuncionarSentenciasJQL(){
@@ -70,6 +82,22 @@ public class JPA17Test {
 			tquery8.setParameter("alumno", new AlumnoPostGrado(5));
 			List<CursoPostGrado> lquery8 = tquery8.getResultList();
 			
+			TypedQuery<CursoPostGrado> tquery9 = em.createQuery(query9, CursoPostGrado.class);
+			tquery9.setParameter("pesoini", 10.0);
+			tquery9.setParameter("pesofin", 70.0);
+			List<CursoPostGrado> lquery9 = tquery9.getResultList();
+			
+			TypedQuery<String> tquery10 = em.createQuery(query10, String.class);
+			List<String> lquery10 = tquery10.getResultList();
+			
+			TypedQuery<Integer> tquery11 = em.createQuery(query11, Integer.class);
+			tquery11.setParameter("nombre", "%"+"ALGO"+"%");
+			List<Integer> lquery11 = tquery11.getResultList();
+			
+			TypedQuery<CursosAlumnosVO> tquery12 = em.createQuery(query12, CursosAlumnosVO.class);
+			tquery12.setParameter("nombre", "%"+"ALGOR"+"%");
+			List<CursosAlumnosVO> lquery12 = tquery12.getResultList();
+			
 			assertNotNull(lquery1);
 			assertNotNull(lquery2);
 			assertNotNull(lquery3);
@@ -78,6 +106,10 @@ public class JPA17Test {
 			assertNotNull(lquery6);
 			assertNotNull(lquery7);
 			assertNotNull(lquery8);
+			assertNotNull(lquery9);
+			assertNotNull(lquery10);
+			assertNotNull(lquery11);
+			assertNotNull(lquery12);
 			
 			assertEquals(lquery2.size(), 50);
 			
@@ -102,6 +134,22 @@ public class JPA17Test {
 			}
 			for (CursoPostGrado cursoPostGrado : lquery8) {
 				System.out.println("Member of: "+cursoPostGrado);
+			}
+			for (CursoPostGrado cursoPostGrado : lquery9) {
+				System.out.println("Using exists: "+cursoPostGrado);
+			}
+			
+			for (String string : lquery10) {
+				System.out.println("Using concat: "+string);
+			}
+
+			for (Integer integer : lquery11) {
+				System.out.println("Using size: "+integer);
+			}
+
+			for (CursosAlumnosVO cursosAlumnosVO : lquery12) {
+				System.out.println(cursosAlumnosVO.getCurso().getNombre() +
+						", " +cursosAlumnosVO.getTotal());
 			}
 			
 			em.getTransaction().commit();
@@ -136,7 +184,7 @@ public class JPA17Test {
 			AlumnoPostGrado alumno8 = new AlumnoPostGrado("41091719", "Federico Román",67.5,new SimpleDateFormat("dd-MM-yyyy").parse("13-04-1982"));
 			AlumnoPostGrado alumno9 = new AlumnoPostGrado("41091720", "Constantino Román",63.8,new SimpleDateFormat("dd-MM-yyyy").parse("19-09-1978"));
 			AlumnoPostGrado alumno10 = new AlumnoPostGrado("41091721", "Mariane Veloso",79.5,new SimpleDateFormat("dd-MM-yyyy").parse("27-10-1990"));
-			AlumnoPostGrado alumno11 = new AlumnoPostGrado("41091722", "Irene Aguiar",80.6,new SimpleDateFormat("dd-MM-yyyy").parse("22-02-1997"));
+			AlumnoPostGrado alumno11 = new AlumnoPostGrado("41091722", "Irene Egler Aguiar",80.6,new SimpleDateFormat("dd-MM-yyyy").parse("22-02-1997"));
 			
 			CursoPostGrado curso1 = new CursoPostGrado("COD-001","ALGORITMIA I", "Curso de 4 creditos");
 			CursoPostGrado curso2 = new CursoPostGrado("COD-002","ALGORITMIA II", "Curso de 3 creditos");
