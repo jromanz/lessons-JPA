@@ -21,6 +21,7 @@ import com.mycompany.demo.util.JPAUtil;
 public class JPA18Test {
 
 	// Uso de sintaxis JQPL en tabla many-to-many
+	// Uso de @NamedQuery
 	// Uso de @SqlResultMapping con @ColumnResult y @FieldResult
 	// con createNativeQuery
 	
@@ -30,7 +31,7 @@ public class JPA18Test {
 			+ " where c.nombre like :nombre";
 	
 	@Test
-	public void deberiaFuncionarSentenciasJQL() {
+	public void deberiaFuncionarSqlResultMapping() {
 		EntityManager em = JPAUtil.getEntityManager();
 
 		try {
