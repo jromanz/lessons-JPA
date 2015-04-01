@@ -1,14 +1,20 @@
 package com.mycompany.automoviles.lesson.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
+import javax.persistence.Query;
 import javax.persistence.StoredProcedureQuery;
 
+import org.eclipse.persistence.jpa.JpaEntityManager;
+import org.eclipse.persistence.queries.ReadAllQuery;
+import org.eclipse.persistence.queries.StoredProcedureCall;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -18,40 +24,118 @@ import com.mycompany.demo.persist.Laptop;
 import com.mycompany.demo.util.JPAUtil;
 
 public class JPA16Test {
+
+	@Test
+	public void deberiaFuncionarStoreProcedureConStoreProcedureCall(){
+		EntityManager em = JPAUtil.getEntityManager();
+
+		try {
+			// Store Procedure IN PARAMETER
+			// Con StoreProcedureCall
+			em.getTransaction().begin();
+			
+			ReadAllQuery readAllQuery = new ReadAllQuery(Object[].class);
+			
+			StoredProcedureCall storeProcedure = new StoredProcedureCall();
+			storeProcedure.setProcedureName("getDoctorByCachorroRaza");
+			storeProcedure.addNamedArgument("raza","PEKINES");
+			readAllQuery.setCall(storeProcedure);
+			
+			Query query = ((JpaEntityManager)em.getDelegate()).createQuery(readAllQuery);
+			@SuppressWarnings("unchecked")
+			List<Object[]> resultado = query.getResultList();
+			
+			for (Object[] object : resultado) {
+				System.out.println(object[0]+",.. "+object[1]+",.. "+object[2]);
+			}
+			System.out.println(resultado.size());
+	
+			em.getTransaction().commit();
+			
+		} catch (Exception e) {
+			if (em.isOpen()) {
+				em.getTransaction().rollback();
+			}
+		} finally {
+			if (em.isOpen()) {
+				em.close();
+			}
+		}
+		
+	}
+	
+	
+	
+	@Test
+	public void deberiaFuncionarStoreProcedureConNativeQuery(){
+		EntityManager em = JPAUtil.getEntityManager();
+
+		try {
+			// Store Procedure IN PARAMETER
+			// Con NativeQuery
+			em.getTransaction().begin();
+			
+			Query storeProcedure = em.createNativeQuery("{call getDoctorByCachorroRaza(?)}");
+			storeProcedure.setParameter(1, "PEKINES");
+			
+			int num = storeProcedure.executeUpdate();
+			
+			System.out.println(num);
+			@SuppressWarnings("unchecked")
+			java.util.List<Object[]> resultado = storeProcedure.getResultList();
+			
+			assertNotNull(resultado);
+			assertEquals(5,resultado.size());
+		
+			for (Object[] object : resultado) {
+				System.out.println(object[0]+", "+object[1]+", "+object[2]);
+			}
+			System.out.println(resultado.size());
+	
+			em.getTransaction().commit();
+			
+		} catch (Exception e) {
+			if (em.isOpen()) {
+				em.getTransaction().rollback();
+			}
+		} finally {
+			if (em.isOpen()) {
+				em.close();
+			}
+		}
+		
+	}
 	
 	@Test
 	public void deberiaFuncionarStoreProcedure(){
 		// uso de JPA 2.1 llamando un store procedure
 		// Este StoreProcedure crearlo en Mysql
-		/*
-		 * DELIMITER $$ 
-		 * CREATE PROCEDURE getDoctorByCachorroRaza(in raza varchar(30)) 
-		 * begin select d.dni, d.nombre, c.raza, c.nombre 
-		 * from persist_doctor d join persist_cachorro c 
-		 * on d.doctor_id = c.doctor_id
-		 * where c.raza = raza; END$$ DELIMITER ;
-		 */
+		// Solo funciona con jpa persistence provider
 		EntityManager em = JPAUtil.getEntityManager();
 
 		try {
 			// Store Procedure IN PARAMETER
 			em.getTransaction().begin();
+			
 			StoredProcedureQuery storeProcedure = em
 					.createStoredProcedureQuery("getDoctorByCachorroRaza");
-			storeProcedure.registerStoredProcedureParameter(0, String.class, ParameterMode.IN);
-			storeProcedure.setParameter(0, "PEKINES");
+			storeProcedure.registerStoredProcedureParameter(1, String.class, ParameterMode.IN);
+			storeProcedure.setParameter(1, "PEKINES");
+			
+			boolean ifResult = storeProcedure.execute();
+			@SuppressWarnings("unchecked")
 			java.util.List<Object[]> resultado = storeProcedure.getResultList();
-			System.out.println(resultado.size());
-			assertEquals(resultado.size(),5);
-			System.out.println(resultado.size());
-			for (Object[] objectJoin : resultado) {
-				for (int i = 0; i < objectJoin.length; i++) {
-					Object object = objectJoin[i];
-					System.out.println(object.toString());
-				}
+			assertNotNull(resultado);
+			assertTrue(ifResult);
+			assertEquals(5,resultado.size());
+		
+			for (Object[] object : resultado) {
+				System.out.println(object[0]+", "+object[1]+", "+object[2]);
 			}
-			em.getTransaction().commit();
+			System.out.println(resultado.size());
 
+			em.getTransaction().commit();
+			
 		} catch (Exception e) {
 			if (em.isOpen()) {
 				em.getTransaction().rollback();

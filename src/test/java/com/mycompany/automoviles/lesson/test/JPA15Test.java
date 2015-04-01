@@ -14,6 +14,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
+import net.sf.ehcache.search.attribute.JavaBeanAttributeExtractor;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -38,7 +40,7 @@ public class JPA15Test {
 	@Test
 	public void testeandoConsultaJoinConCriteria(){
 		EntityManager em = JPAUtil.getEntityManager();
-
+		
 		try {
 
 			// USO DE CRITERIAQUERY Y CRITERIABUILDER
