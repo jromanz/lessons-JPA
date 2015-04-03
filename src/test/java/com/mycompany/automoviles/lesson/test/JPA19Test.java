@@ -8,50 +8,66 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.mycompany.demo.metamodel.AlumnoPostGrado_;
 import com.mycompany.demo.persist.AlumnoPostGrado;
 import com.mycompany.demo.persist.CursoPostGrado;
 import com.mycompany.demo.util.JPAUtil;
 
-public class JPA18Test {
+public class JPA19Test {
 
-	// Uso de sintaxis JQPL en tabla many-to-many
-	// Uso de @NamedQuery con createNamedQuery
-	// Uso de @SqlResultMapping con @ColumnResult y @FieldResult con createNativeQuery
-	
-	String query1 = "select c.codigo, c.nombre, c.descripcion, c.id, ca.alumno_id as alumnito_id "
-			+ "from persist_jpql_curso c inner join persist_jpql_curso_alumno ca "
-			+ " on c.id = ca.curso_id "
-			+ " where c.nombre like :nombre";
-	
+	// Uso de CRITERIA en tabla many-to-many
+
 	@Test
-	public void deberiaFuncionarSqlResultMapping() {
+	public void deberiaFuncionarCriteria() {
+		
 		EntityManager em = JPAUtil.getEntityManager();
-
+		
 		try {
 			em.getTransaction().begin();
 
-			TypedQuery<CursoPostGrado> tquery1 = em.createNamedQuery(
-					"CursoPostGrado.findByName", CursoPostGrado.class);
-			tquery1.setParameter("nombre", "%"+"rqui"+"%");
+			CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+			
+			CriteriaQuery<CursoPostGrado> cQuery1 = criteriaBuilder.createQuery(CursoPostGrado.class);
+			Root<CursoPostGrado> rootCurso = cQuery1.from(CursoPostGrado.class);
+			
+			List<Predicate> condiciones = new ArrayList<Predicate>();
+			
+			String nombre = "%rqui%";
+			if(nombre!=null){
+				Path<String> atributoNombre = rootCurso.get("nombre");
+				Predicate whereNombre = criteriaBuilder.like(atributoNombre, nombre);
+				condiciones.add(whereNombre);
+			}
+			String codigo = "%001%";
+			if(codigo!=null){
+				Path<String> atributoCodigo = rootCurso.get("codigo");
+				Predicate whereCodigo = criteriaBuilder.like(atributoCodigo, codigo);
+				condiciones.add(whereCodigo);
+			}
+			
+			Predicate[] condicionesComoArray = condiciones.toArray(new Predicate[condiciones.size()]);
+			Predicate todasCondiciones = criteriaBuilder.or(condicionesComoArray);
+			cQuery1.where(todasCondiciones);
+			
+			TypedQuery<CursoPostGrado> tquery1 = em.createQuery(cQuery1);
 			List<CursoPostGrado> lquery1 = tquery1.getResultList();
 			for (CursoPostGrado cursoPostGrado : lquery1) {
 				System.out.println(cursoPostGrado);
 			}
-			assertEquals(lquery1.size(), 1);
-			assertNotNull(lquery1);
 			
-			Query tquery2 = em.createNativeQuery(query1, "CursoPostGrado.CURSO_ALUMNO_MAPPING");
-			tquery2.setParameter("nombre", "%"+"rqui"+"%");
-			List<Object[]> lquery2 = tquery2.getResultList();
-			for (Object[] objects : lquery2) {
-				System.out.println(objects[0] + "---"+objects[1]);
-			}
+			
+			assertNotNull(lquery1);
+			assertEquals(lquery1.size(), 2);
 			
 			
 			em.getTransaction().commit();
@@ -68,6 +84,63 @@ public class JPA18Test {
 
 	}
 
+	//Uso de MetaModel
+	@Test
+	public void deberiaFuncionarCriteriaUsandoMetaModel() {
+		
+		EntityManager em = JPAUtil.getEntityManager();
+		
+		try {
+			em.getTransaction().begin();
+
+			CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+			
+			CriteriaQuery<AlumnoPostGrado> cQuery1 = criteriaBuilder.createQuery(AlumnoPostGrado.class);
+			Root<AlumnoPostGrado> rootAlumno = cQuery1.from(AlumnoPostGrado.class);
+			
+			List<Predicate> condiciones = new ArrayList<Predicate>();
+			
+			String nombre = "%uli%";
+			if(nombre!=null){
+				Path<String> atributoNombre = rootAlumno.get(AlumnoPostGrado_.nombre);
+				Predicate whereNombre = criteriaBuilder.like(atributoNombre, nombre);
+				condiciones.add(whereNombre);
+			}
+			double peso = 70.5;
+			if(peso>0){
+				Path<Double> atributoPeso = rootAlumno.get(AlumnoPostGrado_.peso);
+				Predicate wherePeso = criteriaBuilder.greaterThan(atributoPeso, peso);
+				condiciones.add(wherePeso);
+			}
+			
+			Predicate[] condicionesComoArray = condiciones.toArray(new Predicate[condiciones.size()]);
+			Predicate todasCondiciones = criteriaBuilder.or(condicionesComoArray);
+			cQuery1.where(todasCondiciones);
+			
+			TypedQuery<AlumnoPostGrado> tquery1 = em.createQuery(cQuery1);
+			List<AlumnoPostGrado> lquery1 = tquery1.getResultList();
+			for (AlumnoPostGrado alumnoPostGrado : lquery1) {
+				System.out.println(alumnoPostGrado);
+			}
+			
+			assertNotNull(lquery1);
+			assertEquals(lquery1.size(), 6);
+			
+			
+			em.getTransaction().commit();
+
+		} catch (Exception e) {
+			if (em.isOpen()) {
+				em.getTransaction().rollback();
+			}
+		} finally {
+			if (em.isOpen()) {
+				em.close();
+			}
+		}
+
+	}	
+	
 	@BeforeClass
 	public static void testeandoCargaDeDatos() {
 

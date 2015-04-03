@@ -6,6 +6,7 @@
 	<version>1.0</version>
 	<properties>
 		<hibernate.version>4.3.5.Final</hibernate.version>
+		<eclipselink.version>2.5.1</eclipselink.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -25,7 +26,7 @@
 			<version>5.0.1.Final</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- Implementacion de EntityManager de JPA -->
+		<!-- Implementacion Hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
@@ -38,9 +39,20 @@
 			<version>${hibernate.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-jpamodelgen</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+		<!-- Implementación EclipseLink -->
+		<dependency>
 			<groupId>org.eclipse.persistence</groupId>
 			<artifactId>org.eclipse.persistence.jpa</artifactId>
-			<version>2.5.0</version>
+			<version>${eclipselink.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+			<version>${eclipselink.version}</version>
 		</dependency>
 	</dependencies>
 	<repositories>
@@ -78,6 +90,7 @@
 					<target>1.7</target>
 					<compilerArguments>
 						<endorseddirs>${endorsed.dir}</endorseddirs>
+						<processor>org.eclipse.persistence.internal.jpa.modelgen.CanonicalModelProcessor</processor>
 					</compilerArguments>
 				</configuration>
 			</plugin>
